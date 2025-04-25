@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  postgres_db:
+    image: postgres:17-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 25051999
+      POSTGRES_DB: vitorsfdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - springnet
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: springboot_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres_db
+    networks:
+      - springnet
+
+volumes:
+  pgdata:
+
+networks:
+  springnet:
