@@ -1,7 +1,6 @@
 package com.vitorsilvafranca.fiap_tech_challenge_1.shared.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.vitorsilvafranca.fiap_tech_challenge_1.domain.model.usuario.RoleUsuario;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -31,9 +30,11 @@ public class GlobalExceptionHandler {
         if (cause instanceof InvalidFormatException invalidFormat && invalidFormat.getTargetType().isEnum()) {
             String fieldName = invalidFormat.getPath().get(0).getFieldName();
             String valorInvalido = String.valueOf(invalidFormat.getValue());
-            String valoresValidos = Arrays.toString(RoleUsuario.values());
+            Object[] valoresPossiveis = invalidFormat.getTargetType().getEnumConstants();
+            String valoresValidos = Arrays.toString(valoresPossiveis);
 
-            String msg = "Valor inválido para o campo '" + fieldName + "': '" + valorInvalido + "'. Valores aceitos: " + valoresValidos;
+            String msg = "Valor inválido para o campo '" + fieldName + "': '" + valorInvalido +
+                    "'. Valores aceitos: " + valoresValidos;
             return new ResponseEntity<>(new ErrorResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), msg), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(new ErrorResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), "Erro ao interpretar o JSON"), HttpStatus.BAD_REQUEST);
@@ -44,7 +45,6 @@ public class GlobalExceptionHandler {
         String mensagem = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining("; "));
-
         return new ResponseEntity<>(new ErrorResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), mensagem), HttpStatus.BAD_REQUEST);
     }
 
